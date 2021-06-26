@@ -1,0 +1,6 @@
+node_modules
+credentials.json
+token.json
+.env
+backups/*.gz
+backups/*.sql
