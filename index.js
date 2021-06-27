@@ -92,10 +92,15 @@ async function listFiles(auth) {
   }
 }
 
-async function getFolder(auth, name) {
+async function getFolder(auth, name, parentFolderId) {
   const drive = google.drive({ version: "v3", auth });
+  let query = "";
+  if (parentFolderId) {
+    query = `'${parentFolderId}' in parents and `;
+  }
+
   const res = await drive.files.list({
-    // pageSize: 10,
+    q: `${query}name='${name}' and trashed = false and mimeType='application/vnd.google-apps.folder'`,
     fields: "nextPageToken, files(id, name, mimeType)",
   });
   const files = res.data.files;
@@ -113,11 +118,12 @@ async function getFolder(auth, name) {
   return "";
 }
 
-async function createFolder(auth, name) {
+async function createFolder(auth, name, parentFolderId) {
   const drive = google.drive({ version: "v3", auth });
   var fileMetadata = {
     name: name,
     mimeType: "application/vnd.google-apps.folder",
+    parents: parentFolderId ? [parentFolderId] : undefined,
   };
   const file = await drive.files.create({
     resource: fileMetadata,
@@ -126,14 +132,15 @@ async function createFolder(auth, name) {
   return file.id;
 }
 
-async function getOrCreateFolder(auth, name) {
+async function getOrCreateFolder(auth, name, parentFolderId) {
   let fileId = "";
-  fileId = await getFolder(auth, name);
+  fileId = await getFolder(auth, name, parentFolderId);
   if (!fileId) {
-    console.log("Tive que criar nova pasta.");
-    fileId = await createFolder(auth, name);
+    fileId = await createFolder(auth, name, parentFolderId);
   }
-  console.log("ID da pasta", fileId);
+  if (!fileId) {
+    throw new Error("Unable to create new folder.");
+  }
   return fileId;
 }
 
@@ -159,14 +166,16 @@ async function main() {
     const credentials = JSON.parse(fs.readFileSync("./credentials.json"));
     const auth = await authorize(credentials);
 
-    const folderId = await getOrCreateFolder(auth, "dumper_backups");
+    const parentFolderId = await getOrCreateFolder(auth, "backups_MySQL2GD");
     const dbs = await dumper.listAllDatabases();
+    // const dbs = ["cardapp"];
     console.log(dbs);
     for (let i = 0; i < dbs.length; i++) {
       try {
         const db = dbs[i];
+        const dbFolderId = await getOrCreateFolder(auth, db, parentFolderId);
         const [fileName, pathToFile] = await dumper.dumpMysql(db);
-        await uploadFile(auth, fileName, pathToFile, folderId);
+        await uploadFile(auth, fileName, pathToFile, dbFolderId);
       } catch (err) {
         // TODO deu erro em algum aqui... tem que me enviar um email avisando
         console.log(err);
