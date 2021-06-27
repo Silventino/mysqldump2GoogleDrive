@@ -10,7 +10,7 @@ const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
-const TOKEN_PATH = "token.json";
+const TOKEN_PATH = "./token.json";
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -156,7 +156,7 @@ async function uploadFile(auth, fileName, pathToFile, folderId) {
 async function main() {
   try {
     // Load client secrets from a local file.
-    const credentials = JSON.parse(fs.readFileSync("credentials.json"));
+    const credentials = JSON.parse(fs.readFileSync("./credentials.json"));
     const auth = await authorize(credentials);
 
     const folderId = await getOrCreateFolder(auth, "dumper_backups");
