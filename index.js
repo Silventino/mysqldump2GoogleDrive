@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
 const { google } = require("googleapis");
-const dumper = require(path.resolve(__dirname, "/dumper"));
+const dumper = require("./dumper");
 const dotenv = require("dotenv");
 
 dotenv.config({ path: path.resolve(__dirname, "/.env") });
