@@ -1,16 +1,18 @@
 const fs = require("fs");
+const path = require("path");
 const readline = require("readline");
 const { google } = require("googleapis");
-const dumper = require(__dirname + "/dumper");
+const dumper = require(path.resolve(__dirname, "/dumper"));
 const dotenv = require("dotenv");
-dotenv.config();
+
+dotenv.config({ path: path.resolve(__dirname, "/.env") });
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
-const TOKEN_PATH = __dirname + "/token.json";
+const TOKEN_PATH = path.resolve(__dirname, "/token.json");
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -164,7 +166,7 @@ async function main() {
   try {
     // Load client secrets from a local file.
     const credentials = JSON.parse(
-      fs.readFileSync(__dirname + "/credentials.json")
+      fs.readFileSync(path.resolve(__dirname, "/credentials.json"))
     );
     const auth = await authorize(credentials);
 
