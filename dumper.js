@@ -1,6 +1,8 @@
 const mysqldump = require("mysqldump");
 const mysql = require("mysql");
 const dotenv = require("dotenv");
+const path = require("path");
+
 dotenv.config();
 
 function getTodayString() {
@@ -18,7 +20,7 @@ async function dumpMysql(database) {
   }
   const today = getTodayString();
   const fileName = `${database}_${today}.sql.gz`;
-  const pathToFile = `./backups/${fileName}`;
+  const pathToFile = path.resolve(__dirname, "backups", `${fileName}`);
   await mysqldump({
     connection: {
       host: process.env.DB_HOST,
