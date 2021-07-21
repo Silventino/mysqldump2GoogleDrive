@@ -151,11 +151,11 @@ async function uploadFile(auth, fileName, pathToFile, folderId) {
   const res = await drive.files.create({
     requestBody: {
       name: fileName,
-      mimeType: "application/zip",
+      mimeType: "application/gzip",
       parents: folderId ? [folderId] : undefined,
     },
     media: {
-      mimeType: "application/zip",
+      mimeType: "application/gzip",
       body: fs.createReadStream(pathToFile),
     },
   });
