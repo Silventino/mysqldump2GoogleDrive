@@ -21,7 +21,7 @@ function getTodayString() {
   const dd = String(today.getDate()).padStart(2, "0");
   const mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
   const yyyy = today.getFullYear();
-  today = mm + "_" + dd + "_" + yyyy;
+  today = yyyy + "_" + mm + "_" + dd;
   return today;
 }
 
