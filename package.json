@@ -11,7 +11,6 @@
   "dependencies": {
     "dotenv": "^10.0.0",
     "googleapis": "^39.2.0",
-    "mysql": "^2.18.1",
-    "mysqldump": "^3.2.0"
+    "mysql": "^2.18.1"
   }
 }
