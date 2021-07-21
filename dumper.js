@@ -1,9 +1,20 @@
-const mysqldump = require("mysqldump");
 const mysql = require("mysql");
 const dotenv = require("dotenv");
 const path = require("path");
+const exec = require("child_process").exec;
 
 dotenv.config();
+
+async function asyncExec(command) {
+  return new Promise((res, rej) => {
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        rej(error);
+      }
+      res(stdout);
+    });
+  });
+}
 
 function getTodayString() {
   let today = new Date();
@@ -21,20 +32,25 @@ async function dumpMysql(database) {
   const today = getTodayString();
   const fileName = `${database}_${today}.sql.gz`;
   const pathToFile = path.resolve(__dirname, "backups", `${fileName}`);
-  await mysqldump({
-    connection: {
-      host: process.env.DB_HOST,
-      port: process.env.DB_PORT,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: database,
-    },
-    dumpToFile: pathToFile,
-    compressFile: true,
-    dump: {
-      schema: { format: false },
-    },
-  });
+
+  var exec = require("child_process").exec;
+  await asyncExec(
+    `mysqldump -u ${process.env.DB_USER} --port=${process.env.DB_PORT} -p${process.env.DB_PASSWORD} ${database} | gzip > "${pathToFile}"`
+  );
+  // await mysqldump({
+  //   connection: {
+  //     host: process.env.DB_HOST,
+  //     port: process.env.DB_PORT,
+  //     user: process.env.DB_USER,
+  //     password: process.env.DB_PASSWORD,
+  //     database: database,
+  //   },
+  //   dumpToFile: pathToFile,
+  //   compressFile: true,
+  //   dump: {
+  //     schema: { format: false },
+  //   },
+  // });
 
   return [fileName, pathToFile];
 }
